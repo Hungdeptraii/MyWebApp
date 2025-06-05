@@ -2,8 +2,13 @@ pipeline {
     agent any
 
     tools {
-        maven 'Maven3'     // cấu hình tên Maven trong Jenkins
-        jdk 'Java17'       // tên JDK cấu hình trong Jenkins
+        maven 'Maven3'     // Đúng với tên Maven bạn đã cấu hình trong Jenkins (Manage Jenkins > Global Tool Configuration)
+        jdk 'Java21'       // Nếu bạn dùng Java 21 thì sửa lại thành 'Java21'
+    }
+
+    environment {
+        WAR_FILE = "target\\MyWebApp.war"
+        TOMCAT_WEBAPPS = "D:\\apache-tomcat-10.1.41\\webapps\\"
     }
 
     stages {
@@ -15,18 +20,13 @@ pipeline {
 
         stage('Build WAR') {
             steps {
-                sh 'mvn clean package'
+                bat 'mvn clean package'
             }
         }
 
         stage('Deploy to Tomcat') {
             steps {
-                script {
-                    def warFile = "target/MyWebApp.war"
-                    def tomcatWebapps = "C:\\apache-tomcat-10.1.41\\webapps\\"
-
-                    bat "copy ${warFile} ${tomcatWebapps}"
-                }
+                bat "copy /Y \"${env.WAR_FILE}\" \"${env.TOMCAT_WEBAPPS}\""
             }
         }
     }
